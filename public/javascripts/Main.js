@@ -1,53 +1,53 @@
-var socket = io();
-var socketId = "";
-var username = "";
-var onlineUsers;
-// host -> 현재 창의 주소를 담고 있는 변수.
-// 이거 다시 회복
-var host = window.location.protocol + "//" + window.location.host;
-sendAjax(host + '/main/data', "GET", function(Data){
-    Makehtml(Data, function(){
-      swipe();
-    });
-});  
+// var socket = io();
+// var socketId = "";
+// var username = "";
+// var onlineUsers;
+// // host -> 현재 창의 주소를 담고 있는 변수.
+// // 이거 다시 회복
+// var host = window.location.protocol + "//" + window.location.host;
+// sendAjax(host + '/main/data', "GET", function(Data){
+//     Makehtml(Data, function(){
+//       swipe();
+//     });
+// });  
 
-// host -> 현재 창의 주소를 담고 있는 변수.
-var host = window.location.protocol + "//" + window.location.host;
-sendAjax(host + '/profile/user', "POST", function(data){
-    username = data[0].name;
-    socketId = socket.id;
-    socket.emit('connect user', {id: data[0].stID, name: data[0].name}, function(res) {
-        console.log('socket emit "connect user"가 성공하였습니다.');
-    });
-});
+// // host -> 현재 창의 주소를 담고 있는 변수.
+// var host = window.location.protocol + "//" + window.location.host;
+// sendAjax(host + '/profile/user', "POST", function(data){
+//     username = data[0].name;
+//     socketId = socket.id;
+//     socket.emit('connect user', {id: data[0].stID, name: data[0].name}, function(res) {
+//         console.log('socket emit "connect user"가 성공하였습니다.');
+//     });
+// });
 
-socket.on("onlineUsers", function(users) {
-  console.log("onlineUsers의 목록 :", users);
-  onlineUsers = users;
-});
+// socket.on("onlineUsers", function(users) {
+//   console.log("onlineUsers의 목록 :", users);
+//   onlineUsers = users;
+// });
 
-socket.on("alarm", function(data) {
-  console.log('alarm: ', data);
-})
+// socket.on("alarm", function(data) {
+//   console.log('alarm: ', data);
+// })
 
 
 
-// 이거 다시 회복
+// // 이거 다시 회복
 
-var SavedGetData; 
-function sendAjax(url, method, call) {
-	const xhr = new XMLHttpRequest();
-	xhr.open(method, url);
+// var SavedGetData; 
+// function sendAjax(url, method, call) {
+// 	const xhr = new XMLHttpRequest();
+// 	xhr.open(method, url);
 
-	var data = null;
-    xhr.send(data);
+// 	var data = null;
+//     xhr.send(data);
 
-    xhr.addEventListener('load', function(){
-        const result = JSON.parse(xhr.responseText);
-		console.log("Getting data success!", result);
-		call(result);
-    });
-};
+//     xhr.addEventListener('load', function(){
+//         const result = JSON.parse(xhr.responseText);
+// 		console.log("Getting data success!", result);
+// 		call(result);
+//     });
+// };
 
 // 토글 버튼 클릭시 서버로 데이터 전송
 //https://ourcstory.tistory.com/161 블로그 주소
@@ -69,11 +69,11 @@ $.ajax({
 
 // 이거 다시 지움
 
-// let SavedGetData = JSON.parse(localStorage.getItem("Datas"));
-// /* 받아온 Data 불러오기 (localstorage) */
-// if (SavedGetData!==null){
-//     Makehtml(SavedGetData);
-// }
+let SavedGetData = JSON.parse(localStorage.getItem("Datas"));
+/* 받아온 Data 불러오기 (localstorage) */
+if (SavedGetData!==null){
+    Makehtml(SavedGetData);
+}
  
 
 // main list html 만들기 1
@@ -124,7 +124,7 @@ function Makehtml(Data_obj, callback){
         item.addEventListener("click",reviseAjax );  
       });
     
-    callback();
+    // callback();
 }
 
 // main list html 만들기 2
@@ -158,7 +158,7 @@ function createHTML(item){
                 <li  class="swiper-slide" >
                     <div class="L_Text">
                         <div class="L_Top_Text"><span>${S_TEXT}</span><i class="fas fa-arrow-right"></i><span >${E_TEXT}</span></div>
-                        <div class="L_bottom_Text"><span class="Time">${TIME_TEXT}</span><span>${DAorWE}</span></div>
+                        <div class="L_bottom_Text"><span class="Time">${TIME_TEXT}</span><span class="DATEorWEEK">${DAorWE}</span></div>
                     </div>
                     <div class="bu_arrow_wrap">
                     <div class="ON_OFF">
@@ -249,7 +249,17 @@ function removeAjax(event){
 // 수정 버튼 눌렀을때 AJAX함수
 function reviseAjax(event){
   let li_from_vi = event.currentTarget.parentElement.parentElement.parentElement.parentElement;
+  let WeekorDate = event.currentTarget.parentElement.parentElement.children[0].children[1].children[1].innerText //.nextElementSibling; //.children;//.nextElementSibling.nextElementSibling.children.nextElementSibling.children;
+  let pickyear = WeekorDate.substring(WeekorDate.length-4,WeekorDate.length)
+  console.log(WeekorDate.substring(WeekorDate.length-4,WeekorDate.length),"하자!")
   console.log("update",li_from_vi)
+  var now = new Date();
+  var year = now.getFullYear();
+  if(pickyear==year){
+    console.log("This the long");
+  } else{
+    console.log("this is short")
+  }
   $.ajax({ 
         url:`/main/${li_from_vi.id}`, 
              type:"update", data:null, 
@@ -258,8 +268,12 @@ function reviseAjax(event){
                   if (result) 
                   { console.log("저장되었습니다.",result); 
                   // result 로 가져와서 if쓰기
-
-                  window.location.href = '/main/MS_input'
+                  if(WeekorDate===year){
+                    console.log("This the long");
+                  } else{
+                    console.log("this is short")
+                  }
+                  /* window.location.href = '/main/MS_input' */
                   // window.locatino.href = '/main/ML_input'
                 } 
                   else { console.log("전달실패",result); } 
@@ -307,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 스와이프 코드
 // 서버 용
-console.log($('#test li'),"swipe")
+/* console.log($('#test li'),"swipe")
 function swipe(){
   $(function () {
       $('#test li').swipe({
@@ -377,9 +391,9 @@ function swipe(){
         threshold: 200,
       });
     });
-  }
+  } */
   // local 용
-    /* $(function () {
+     $(function () {
         $('#test li').swipe({
           swipeStatus: function (event, phase, direction, distance, duration, fingers, fingerData, currentDirection) {
             if (direction === 'right') {
@@ -446,7 +460,7 @@ function swipe(){
           },
           threshold: 200,
         });
-      }); */
+      }); 
     
   
 
@@ -484,46 +498,46 @@ function swipe(){
 // Makehtml -> MakeChat_html
 // createHTML -> createChat_html
 // SavedGetData -> SavedChatData
-// var SavedChatData = [{
-//   name:"신경식",
-//   Chat_content:"안녕하세요 저는 신경식입니다",
-//   Chat_time: "10:30 AM" ,
-// },
-// {
-//   name:"김준현",
-//   Chat_content:"안녕하세요 저는 윗미의 팀장입니다",
-//   Chat_time: "12:30 PM" ,
-// },
-// {
-//   name:"정예준",
-//   Chat_content:"안녕하세요 저는 윗미의 요리사 입니다",
-//   Chat_time: "11:30 AM" ,
-// }
-// ]
+var SavedChatData = [{
+  name:"신경식",
+  Chat_content:"안녕하세요 저는 신경식입니다",
+  Chat_time: "10:30 AM" ,
+},
+{
+  name:"김준현",
+  Chat_content:"안녕하세요 저는 윗미의 팀장입니다",
+  Chat_time: "12:30 PM" ,
+},
+{
+  name:"정예준",
+  Chat_content:"안녕하세요 저는 윗미의 요리사 입니다",
+  Chat_time: "11:30 AM" ,
+}
+]
 // local 코드
-// MakeChat_html(SavedChatData);
+MakeChat_html(SavedChatData);
 
 
 // 서버 코드
-var host = window.location.protocol + "//" + window.location.host;
-sendAjax(host + '/main/chat_data', "GET", function(Data){
-  MakeChat_html(Data);
-});  
+// var host = window.location.protocol + "//" + window.location.host;
+// sendAjax(host + '/main/chat_data', "GET", function(Data){
+//   MakeChat_html(Data);
+// });  
 
-var SavedChatData; 
-function sendAjax(url, method, call) {
-	const xhr = new XMLHttpRequest();
-	xhr.open(method, url);
+// var SavedChatData; 
+// function sendAjax(url, method, call) {
+// 	const xhr = new XMLHttpRequest();
+// 	xhr.open(method, url);
 
-	var data = null;
-    xhr.send(data);
+// 	var data = null;
+//     xhr.send(data);
 
-    xhr.addEventListener('load', function(){
-        const result = JSON.parse(xhr.responseText);
-		console.log("Getting data success!", result);
-		call(result);
-    });
-};
+//     xhr.addEventListener('load', function(){
+//         const result = JSON.parse(xhr.responseText);
+// 		console.log("Getting data success!", result);
+// 		call(result);
+//     });
+// };
 function MakeChat_html(ChatData_obj){
   let Chat_screen = document.querySelector(".screen")
  
@@ -541,21 +555,21 @@ function MakeChat_html(ChatData_obj){
 function createChat_html(item){
   
   //////// sever code ///////
-  let Chat_ID = item.roomID;
-  let CH_name = item.participants;
-  let CH_con = item.message;
-  let CH_Severtime =  item.time; 
-  let CH_time = CH_Severtime.substring(12,16);
-  let L_START = item.Location_start;
-  let L_END = item.Location_end;
+  // let Chat_ID = item.roomID;
+  // let CH_name = item.participants;
+  // let CH_con = item.message;
+  // let CH_Severtime =  item.time; 
+  // let CH_time = CH_Severtime.substring(12,16);
+  // let L_START = item.Location_start;
+  // let L_END = item.Location_end;
   ////////local data
-  // let Chat_ID = "2345";
-  // let CH_name = "신경식";
-  // let CH_con = "안녕하세요 커피유야 같이갈 사람 구합니다";
-  // let CH_Severtime =  "12:30"; 
-  // let CH_time = "12:30";
-  // let L_START = "한동대";
-  // let L_END = "커피유야";
+  let Chat_ID = "2345";
+  let CH_name = "신경식";
+  let CH_con = "안녕하세요 커피유야 같이갈 사람 구합니다";
+  let CH_Severtime =  "12:30"; 
+  let CH_time = "12:30";
+  let L_START = "한동대";
+  let L_END = "커피유야";
      return`
     <div id="CHAT${Chat_ID}" class="user_item_layout"> 
         <img class="circle profile" alt="프로필 이미지" src="https://mblogthumb-phinf.pstatic.net/20150427_261/ninevincent_1430122791768m7oO1_JPEG/kakao_1.jpg?type=w2"/>
@@ -582,7 +596,7 @@ function ChatArrow(event){
   let ChatRoom = event.currentTarget.parentElement;
   let ChatRoom_id = ChatRoom.id.substring(4)
 
-  console.log("check",'/chat/' + ChatRoom_id)
-  window.location.href = host + '/chat/' + ChatRoom_id
+  // console.log("check",'/chat/' + ChatRoom_id)
+  // window.location.href = host + '/chat/' + ChatRoom_id
 }
 
